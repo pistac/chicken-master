@@ -26,8 +26,6 @@ public class EndingManager : MonoBehaviour {
   [SerializeField]
   private GameObject additionalCommentsPage;
   [SerializeField]
-  private GameObject pilotQuestionPage;
-  [SerializeField]
   private GameObject completionCodePage;
   [SerializeField]
   private GameObject continueButton;
@@ -61,10 +59,6 @@ public class EndingManager : MonoBehaviour {
   private InputField commentsInputField;
   [SerializeField]
   private InputField technicalIssuesInputField;
-  [SerializeField]
-  private InputField pilotQuestionInputField;
-  [SerializeField]
-  private GameObject pilotQuestionErrorText;
 #pragma warning disable
 
   private GameObject[] orderedPages; // Array of references to pages in the order they should appear.
@@ -82,7 +76,7 @@ public class EndingManager : MonoBehaviour {
     experimentDataManager = GameObject.Find("ExperimentDataManager").GetComponent<ExperimentDataManager>();
 
     // Order the pages.
-    orderedPages = new GameObject[] { participantDataPage1, participantDataPage2, participantDataPage3, additionalCommentsPage, pilotQuestionPage, completionCodePage };
+    orderedPages = new GameObject[] { participantDataPage1, participantDataPage2, participantDataPage3, additionalCommentsPage, completionCodePage };
 
     // Find the first active page and set the currentPageIndex. This is only necessary if the scene is set up incorrectly.
     // Guarantees that at most one page is open at the start.
@@ -180,23 +174,10 @@ public class EndingManager : MonoBehaviour {
 
       // Move to next page and disable continue button.
       NextPage();
-      //continueButton.SetActive(false);
+      continueButton.SetActive(false);
 
       // Tell experiment data manager to start packing and sending data.
-      //experimentDataManager.PackAndSendExperimentData();
-    } else if (pilotQuestionPage.activeSelf) {
-      if (pilotQuestionInputField.text != "") {
-        experimentDataManager.pilotQuestionAnswer = pilotQuestionInputField.text;
-
-        // Move to next page and disable continue button.
-        NextPage();
-        continueButton.SetActive(false);
-
-        // Tell experiment data manager to start packing and sending data.
-        experimentDataManager.PackAndSendExperimentData();
-      } else {
-        pilotQuestionErrorText.SetActive(true);
-      }
+      experimentDataManager.PackAndSendExperimentData();
     }
   }
 

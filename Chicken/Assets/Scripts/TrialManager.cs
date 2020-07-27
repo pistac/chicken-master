@@ -254,15 +254,25 @@ public class TrialManager : MonoBehaviour {
 
     // Pack information about whether collision and swerve has happened into the trial data.
     currentTrial.collision = sharedVariableManager.collisionHasHappened;
-    currentTrial.swerve = sharedVariableManager.playerHasSwerved;
+    currentTrial.playerSwerve = sharedVariableManager.playerSwerved;
+    currentTrial.robotSwerve = sharedVariableManager.robotSwerved;
 
     // If player swerved, pack the distances into the trial data.
-    if (currentTrial.swerve) {
-      currentTrial.robotDistance = sharedVariableManager.playerRobotSwerveDistance;
-      currentTrial.startDistance = sharedVariableManager.playerStartSwerveDistance;
+    if (currentTrial.playerSwerve) {
+      currentTrial.playerRobotDistance = sharedVariableManager.playerRobotSwerveDistance;
+      currentTrial.playerStartDistance = sharedVariableManager.playerStartSwerveDistance;
     } else {
-      currentTrial.robotDistance = -1.0f;
-      currentTrial.startDistance = -1.0f;
+      currentTrial.playerRobotDistance = -1.0f;
+      currentTrial.playerStartDistance = -1.0f;
+    }
+
+    // If robot swerved, pack the distances into the trial data.
+    if (currentTrial.robotSwerve) {
+      currentTrial.robotPlayerDistance = sharedVariableManager.robotPlayerSwerveDistance;
+      currentTrial.robotStartDistance = sharedVariableManager.robotStartSwerveDistance;
+    } else {
+      currentTrial.robotPlayerDistance = -1.0f;
+      currentTrial.robotStartDistance = -1.0f;
     }
   }
 
@@ -285,7 +295,7 @@ public class TrialManager : MonoBehaviour {
         int numCollisions = 0;
 
         foreach (Trial trial in trials) {
-          if (trial.swerve) ++numSwerves;
+          if (trial.playerSwerve) ++numSwerves;
           if (trial.collision) ++numCollisions;
         }
 

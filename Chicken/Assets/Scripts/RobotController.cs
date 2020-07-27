@@ -114,9 +114,15 @@ public class RobotController : MonoBehaviour {
           Vector3.RotateTowards(transform.parent.InverseTransformDirection(transform.forward),
           robotDirection, rotationSpeed, 0.0f));
     } else { // If the player is within the minimum swerve distance.
-      // Pick the appropriate swerve direction if none has been picked.
+      // Pick the appropriate swerve direction if none has been picked, and report distances.
       if (swerveDirection == 0) {
         PickSwerveDirection();
+
+        sharedVariableManager.robotSwerved = true;
+
+        // Report swerve distances.
+        sharedVariableManager.robotPlayerSwerveDistance = Vector3.Distance(transform.position, playerTransform.position);
+        sharedVariableManager.robotStartSwerveDistance = Vector3.Distance(transform.position, GameObject.Find("RobotStartPoint").transform.position);
       }
 
       // Move robot along swerve direction.

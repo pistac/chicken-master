@@ -99,6 +99,8 @@ public class PlayerController : MonoBehaviour {
 
     // If there is swerve input and player is not currently swerving.
     if (swerveInput && !currentlySwerving) {
+      sharedVariableManager.playerSwerved = true;
+
       // Report swerve distances.
       sharedVariableManager.playerRobotSwerveDistance = Vector3.Distance(transform.position, robotTransform.position);
       sharedVariableManager.playerStartSwerveDistance = Vector3.Distance(transform.position, GameObject.Find("PlayerStartPoint").transform.position);

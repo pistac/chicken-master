@@ -13,10 +13,13 @@ public enum TrialType {
 public class Trial {
 
   public bool collision { get; set; } // Whether a collision happened in the trial.
-  public bool swerve { get; set; } // Whether the player swerved in the trial.
+  public bool playerSwerve { get; set; } // Whether the player swerved in the trial.
+  public bool robotSwerve { get; set; } // Whether the robot swerved in the trial.
   public EnvironmentType environmentType { get; private set; }
-  public float robotDistance { get; set; } // The distance between player and robot when player swerved.
-  public float startDistance { get; set; } // The distance between player and start position when player swerved.
+  public float playerRobotDistance { get; set; } // The distance between player and robot when player swerved.
+  public float playerStartDistance { get; set; } // The distance between player and start position when player swerved.
+  public float robotPlayerDistance { get; set; } // The distance between robot and player when robot swerved.
+  public float robotStartDistance { get; set; } // The distance between robot and start position when robot swerved.
   public int trialNum { get; private set; } // This trial's number in the order.
   public RobotColor robotColor { get; set; }
   public RobotType robotType { get; private set; } // The type of robot that appears in the trial.
@@ -47,6 +50,6 @@ public class Trial {
   }
 
   public override string ToString() {
-    return "{collision:" + collision + ", swerve:" + swerve + ", robotDistance:" + robotDistance + ", startDistance:" + startDistance + ", trialNum:" + trialNum + ", robotType:" + robotType + ", trialType:" + trialType + "}";
+    return "{collision:" + collision + ", playerSwerve:" + playerSwerve + ", robotSwerve:" + robotSwerve + ", playerRobotDistance:" + playerRobotDistance + ", playerStartDistance:" + playerStartDistance + ", robotPlayerDistance:" + robotPlayerDistance + ", robotStartDistance:" + robotStartDistance + ", trialNum:" + trialNum + ", robotType:" + robotType + ", trialType:" + trialType + "}";
   }
 }

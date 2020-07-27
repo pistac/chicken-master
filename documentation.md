@@ -20,23 +20,29 @@ The general flow of the project is as follows. The participant accepts the HIT o
 
 The game starts in the IntroScene, where participants read instructions and give consent to partake. Participants also select their avatar's gender expression and skin color. The main script governing this scene is the IntroManager.
 
-Then, the game goes onto the trial scene. Participants are told what type of trial it is on the loading screen, then the trial starts, where the participant faces a robot and can decide to swerve. After the agents have passed each other, the trial is over. The scene is then reloaded with new trial settings. The main script governing this scene is the TrialManager.
+Then, the game goes onto the trial scene. Participants are told what type of trial it is on the loading screen, then the trial starts, where the participant faces a robot and can decide to swerve. A close-up of the robot is displayed on the screen. After the agents have passed each other, the trial is over. The scene is then reloaded with new trial settings. The main script governing this scene is the TrialManager. If at any point in the trial scene the mouse cursor is taken outside of the screen area, the game is paused and an overlay is displayed above the rest of the game's content. The loading screens are not paused.
 
 After all the trials are complete, the participant is taken to the ending scene. Here, the participant enters their demographic information for the experiment in three steps, are allowed to enter additional comments and report technical issues and then are given the mturk completion code in a dialog box. The participant returns to the mturk page and enters the completion code to complete the HIT.
 
 ### Project file structure
 
 All the different directories in the project file structure is explained here. The directories are:
+- BrokenVector
 - Fonts
 - Materials
 - MesoGames
 - Models
 - Plugins
 - Prefabs
+- RenderTextures
 - Scenes
 - Scripts
 - Textures
 - WebGLTemplates
+
+#### BrokenVector
+
+Directory containing all the files associated with the imported LowPolyTreePack from the Unity asset store.
 
 #### Fonts
 
@@ -74,6 +80,10 @@ Directory containing prefab files that are derived from game objects. Some are a
 
 Prefabs are used as premade objects. They can be imported into a scene directly, or used by a script and loaded at runtime.
 
+#### RenderTextures
+
+Directory containing render textures. Should contain the render texture for the robot camera.
+
 #### Scenes
 
 Directory containing all of the three scenes of the game.
@@ -88,13 +98,14 @@ Directory containing all of the scripts of the game. An overview of each script 
 - CameraController: Simple script for ensuring that the player camera is in the correct position in every frame during a trial.
 - Comments: Defines a data structure to hold information about comments that the participant enters.
 - EndingManager: Driving script for the ending scene. Defines behavior for the buttons that require scripting in the scene, and validates input where required. Contacts the ExperimentDataManager script to send participant data and to initiate the sending of experiment data.
-- EnvironmentUniquenessChecker: Simple script for ensuring that at most one environment model is loaded at any given time during a trial. This was a necessity to fix a bug where multiple environments were loaded.
 - ExperimentDataManager: Acts as a repository for all the experiment data that is acquired during the game. Contains a list of Trials, an Appearance, a Participant, a Comments and a string for the mturk completion code. Calls the EndingManager to display the dialog box. Defines a function for sending the experiment data to the Google Forms form.
 - HelperFunctions: Contains static helper functions that can be accessed from anywhere but do not make sense to be put in any particular script.
 - IntroManager: Driving script for the intro scene. Defines behavior for the buttons that require scripting in the scene, and validates input where required. Contacts the ExperimentDataManager script to send appearance data.
 - OverlayManager: Defines the behavior of the loading screens during the trial scene. Manages the onLoadIsFinished delegate by setting the flags in the SharedVariableManager.
 - Participant: Defines a data structure to hold all the data about a participant.
+- PauseManager: Defines behavior of pausing the game when the mouse cursor moves outside of the game area. This is to make sure that the mouse cursor is never positioned in a way that makes the space key behave differently, such as when the cursor is placed in a search field.
 - PlayerController: Takes player input and moves the player avatar. Also defines when the game is over. Relies on the onLoadIsFinished delegate.
+- RobotCameraController: Identical to CameraController, but used on the robot's camera.
 - RobotController: Moves the robot agent, decides when to swerve. Relies on the onLoadIsFinished delegate.
 - SharedVariableManager: Holds variables, including flags, that multiple classes need access to and that do not make sense being part of any one of the accessing classes. Defines the UnityAction delegates onGameIsOver and onLoadIsFinished that synchronizes the behavior of other scripts in the trial scene.
 - Trial: Defines a data structure to hold information about a trial.
@@ -124,6 +135,7 @@ Experiment data is all the data that is collected during the game, and used for 
 
 The different categories of data are as follows:
 - Amazon mechanical turk completion code: Random string of numbers and capital letters created once a participant has finished the trials and entered the participant data.
+- Player referred by Amazon mechanical turk: Indicates in the experiment data whether the player was referred to the game page by Amazon mechanical turk.
 - Browser data: Collected by a short javascript script in the index.html file in the docs directory and sent into the Unity instance using a SetInterval to ensure that the data is collected correctly. Consists of the name of the browser used by the participant, as well as device width, height, pixel ratio and depth and color depth. When send it is formatted as a string with each piece of data separated by a string token of the form "SPLIT". ExperimentDataManager collects the string and splits into the separate pieces of data.
 - Appearance data: The player avatar's appearance data, consisting of the skin color and gender expression of the avatar. Entered by the participant in the intro scene.
 - Participant data: Demographic information about the participant, entered by the participant in the ending scene.
@@ -132,7 +144,9 @@ The different categories of data are as follows:
 
 The Google Forms form is constructed beforehand, with one free-text question with no input validation created for each piece of data to be collected. After the form is created, it is previewed by clicking the preview button in the Google Forms interface. Viewing the page source and searching for "form action" gives the url that Unity should send its form data to using the POST method.
 
-The field names in the form are tedious to enter into Unity. By viewing the page source of the previewd form in the inspector and searching for "entry." gives a long list of entry names. Each question in the form has one name associated with it on the form "entry.XXXXXXX" where the Xs is some string of numbers. For question number i in the form, the ith entry name is the one associated with the question. In Unity, the form data is constructed in the same order, in order to correspond to the Google Forms form.
+The field names in the form are entered into Unity. By viewing the page source of the previewed form in the inspector and searching for "entry." gives a long list of entry names. Each question in the form has one name associated with it on the form "entry.XXXXXXX" where the Xs is some string of numbers. For question number i in the form, the ith entry name is the one associated with the question. In Unity, the form data is constructed in the same order, in order to correspond to the Google Forms form.
+
+The entry names can be extracted and formatted appropriately for a C# array by copying and pasting the all of the HTML input elements into Atom, opening the Find and Replace panel, pasting `<input type="hidden" name=("entry\.\d*") value="">` into the Find field and `$1, ` (with the trailing space) into the Replace field then pressing Replace All. The result can then be pasted into the entryNames array in the ExperimentDataManager.
 
 ## Amazon mechanical turk
 
@@ -140,4 +154,4 @@ The game is connected to Amazon mechanical turk through a HIT. The HIT is create
 
 To validate that the worker has truthfully completed the HIT and not made up some survey completion code, cross-validate that the completion code entered in mturk (available in the HIT results) is present in the responses to the Google Forms form.
 
-Data is only sent to the form and entered into the spreadsheet if the game website was referred by mturk. This is checked by the index.html file sending the site referrer to the Unity instance, and the ExperimentDataManager script making sure the referrer contains the string "mturk". This is not foolproof in any way, but it is secure enough for the purposes of the experiment, while also staying general enough to withstand potential changes that Amazon does to the mturk service.
+Data is sent to the form and entered into the spreadsheet as long as the game is not played through the Unity editor. If the game website was referred by mturk, this will be reflected in the "Referred by mturk" field in the form. It is checked by the index.html file sending the site referrer to the Unity instance, and the ExperimentDataManager script making sure the referrer contains the string "mturk". This is not foolproof in any way, but it is sufficient for the purposes of the experiment, while also staying general enough to withstand potential changes that Amazon does to the mturk service.

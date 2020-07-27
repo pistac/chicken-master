@@ -35,7 +35,6 @@ public class ExperimentDataManager : MonoBehaviour {
   public Comments comments { get; set; }
   public Participant participant { get; set; }
   public string completionCode { get; private set; }
-  public string pilotQuestionAnswer { get; set; }
   public Trial[] allCompletedTrials { get; set; }
 
   // The text that is displayed once the data has been sent succesfully without any errors at all.
@@ -98,14 +97,13 @@ public class ExperimentDataManager : MonoBehaviour {
       completionCode += randomCharacters[UnityEngine.Random.Range(0, randomCharacters.Length)];
     }
 
-    // Only organize and send data if the game is loaded from clicking the mturk link.
-    if (!fromMturk) {
-      dataSentText.GetComponent<Text>().text = "Not referred by mturk, no data sent.";
-      return;
-    }
-
     // Hide the data sent text.
     dataSentText.SetActive(false);
+
+    // Make sure no data is sent from the editor.
+    if (Application.isEditor) {
+      return;
+    }
 
     // Create empty form to be filled.
     WWWForm form = new WWWForm();
@@ -117,88 +115,78 @@ public class ExperimentDataManager : MonoBehaviour {
     // Each name "entry.xxxxxxxxx" in the page source of the form is associated with
     // a field in the form. The names appear in the same order as their associated form fields.
 
-    form.AddField("entry.810487420", pilotQuestionAnswer);
+    // Define the google forms entry names for the browser data field.
+    string[] entryNames = {
+      "entry.2102565097", "entry.1050089162", "entry.325057486", "entry.668756629", "entry.1299027027", "entry.209343723", "entry.2143973390", "entry.1170127299", "entry.1971309472", "entry.959514617", "entry.1448387481", "entry.1498849561", "entry.1638486898", "entry.442090000", "entry.350014395", "entry.356375231", "entry.1309304759", "entry.38794875", "entry.1171193467", "entry.879983441", "entry.680918694", "entry.1106786836", "entry.1836300788", "entry.1065831825", "entry.1849938861", "entry.1888736609", "entry.199685991", "entry.1073660661", "entry.1672035224", "entry.1615693308", "entry.507018996", "entry.989184125", "entry.162187417", "entry.1815978254", "entry.796281002", "entry.1385308899", "entry.144971403", "entry.209492634", "entry.1846236541", "entry.610244547", "entry.640924627", "entry.1205187465", "entry.366145254", "entry.1787509928", "entry.1554757662", "entry.1472227790", "entry.1767150327", "entry.1691391716", "entry.1064521466", "entry.205553732", "entry.891216200", "entry.850884029", "entry.1812249595", "entry.634894112", "entry.1358194031", "entry.507395107", "entry.1677946273", "entry.1389930311", "entry.2024119880", "entry.677488588", "entry.666595036", "entry.1204487034", "entry.752503403", "entry.778445308", "entry.159005044", "entry.1287998562", "entry.59459121", "entry.1228489286", "entry.808833129", "entry.557002799", "entry.1950560555", "entry.1856650253", "entry.1767336715", "entry.1667804196", "entry.762485876", "entry.1028264811", "entry.1608521129", "entry.704817160", "entry.617317449", "entry.1563994397", "entry.1710075187", "entry.184670083", "entry.152965652", "entry.123955457", "entry.681027680", "entry.1695068342", "entry.353900112", "entry.869033953", "entry.1474451829", "entry.939991490", "entry.211043753", "entry.362969139", "entry.60821853", "entry.1146785843", "entry.24193386", "entry.27987899", "entry.1652192115", "entry.1027795179", "entry.1946494531", "entry.445322347", "entry.316062295", "entry.234804059", "entry.1578950088", "entry.1165839429", "entry.1469196843", "entry.30384960", "entry.1907492921", "entry.1709798930", "entry.936868166", "entry.626030777", "entry.1779219849", "entry.1280929265", "entry.1464747003", "entry.711649843", "entry.524931184", "entry.630635211", "entry.327756603", "entry.61937369", "entry.1416826944", "entry.489635428", "entry.1595136968", "entry.199916412", "entry.194938037", "entry.1506447004", "entry.1564931999", "entry.1176109734", "entry.610932943", "entry.1049466728", "entry.1777864433", "entry.857718607", "entry.204287501", "entry.1137653101", "entry.1162151476", "entry.1062180568", "entry.1213508073", "entry.83842712", "entry.629317917", "entry.290610110", "entry.1679535671", "entry.1646461902", "entry.724822568", "entry.686790924", "entry.958512629", "entry.62442000", "entry.1848800995", "entry.143980122", "entry.1596709479", "entry.96611693", "entry.2095172296", "entry.723345761", "entry.2029916574", "entry.2061760441", "entry.575846027", "entry.1831188811", "entry.744952910", "entry.1175503029", "entry.713333567", "entry.1199722310", "entry.1832120513", "entry.642829443", "entry.1932968240", "entry.583340503", "entry.1111166703", "entry.305658947", "entry.265415914", "entry.1593029504", "entry.1221871163", "entry.1171308453", "entry.1780979012", "entry.806223075", "entry.240684259", "entry.1188964473", "entry.1415593360", "entry.196197999", "entry.731226930", "entry.905927214", "entry.1060749197", "entry.1007765480", "entry.1980898855", "entry.1516352616", "entry.32009194", "entry.1689382772", "entry.707087444", "entry.837458053", "entry.590833243", "entry.782851574", "entry.748850698", "entry.120995142", "entry.1058189061", "entry.931833010", "entry.1417346672", "entry.732631853", "entry.1044617373", "entry.1419472031", "entry.1255430642", "entry.806433142", "entry.487521379", "entry.505232445", "entry.1988601980", "entry.2062137073", "entry.352657901", "entry.676781871", "entry.878308445", "entry.1945010534", "entry.1088334287", "entry.1704380725", "entry.1658704227", "entry.1606447449", "entry.1488825025", "entry.1311070530", "entry.1870522338", "entry.1372930152", "entry.1740317376", "entry.1136013579", "entry.703951857", "entry.341959164", "entry.1538726404", "entry.894794263", "entry.70233209", "entry.168923590", "entry.474571341", "entry.89565362", "entry.636553449", "entry.802927827", "entry.1034650556", "entry.372742471", "entry.1937689360", "entry.546587912", "entry.1170429375", "entry.1482689945", "entry.985531814", "entry.558112315", "entry.1843359020", "entry.920394459", "entry.2142056780", "entry.89603061", "entry.240285220", "entry.37428136", "entry.2032568713", "entry.1383321686", "entry.1176133842", "entry.1726931234", "entry.942665654", "entry.898573227", "entry.1823800061", "entry.877187950", "entry.1065864885"
+    };
+
+    int entryNameIndex = 0;
 
     // Add mturk completion code.
-    form.AddField("entry.2102565097", completionCode);
+    form.AddField(entryNames[entryNameIndex++], completionCode);
 
-    // Define the google forms entry names for the browser data field.
-    string[] browserDataEntryNames = {
-      "entry.325057486", "entry.668756629", "entry.1299027027", "entry.209343723", "entry.2143973390", "entry.1170127299"
-    };
+    // Add mturk referral field.
+    form.AddField(entryNames[entryNameIndex++], fromMturk.ToString());
+
 
     // Add browser data.
     for (int i = 0; i < browserData.Length; ++i) {
-      form.AddField(browserDataEntryNames[i], browserData[i]);
+      form.AddField(entryNames[entryNameIndex++], browserData[i]);
     }
 
     // Add participant data.
-    form.AddField("entry.1971309472", participant.seenRobotsBefore.ToString());
-    form.AddField("entry.959514617", participant.age);
-    form.AddField("entry.1448387481", participant.country);
-    form.AddField("entry.1498849561", participant.gamesExperience);
-    form.AddField("entry.1638486898", participant.gender);
-    form.AddField("entry.442090000", participant.levelOfEducation);
-    form.AddField("entry.350014395", participant.robotExperience);
+    form.AddField(entryNames[entryNameIndex++], participant.seenRobotsBefore.ToString());
+    form.AddField(entryNames[entryNameIndex++], participant.age);
+    form.AddField(entryNames[entryNameIndex++], participant.country);
+    form.AddField(entryNames[entryNameIndex++], participant.gamesExperience);
+    form.AddField(entryNames[entryNameIndex++], participant.gender);
+    form.AddField(entryNames[entryNameIndex++], participant.levelOfEducation);
+    form.AddField(entryNames[entryNameIndex++], participant.robotExperience);
 
     // Add appearance data.
-    form.AddField("entry.356375231", appearance.skinColor.ToString());
-    form.AddField("entry.1309304759", appearance.gender.ToString());
+    form.AddField(entryNames[entryNameIndex++], appearance.skinColor.ToString());
+    form.AddField(entryNames[entryNameIndex++], appearance.gender.ToString());
 
     // Add comments.
-    form.AddField("entry.38794875", comments.additionalComments);
-    form.AddField("entry.1171193467", comments.technicalIssues);
-
-    // Define the google forms entry names for each trial.
-    string[,] trialEntryNames = {
-      {"entry.879983441","entry.680918694","entry.1106786836","entry.1836300788","entry.1065831825","entry.1849938861","entry.1888736609","entry.199685991"},
-      {"entry.335766038","entry.1453525793","entry.934214645","entry.1463040831","entry.1546759079","entry.352759968","entry.1938948057","entry.372870555"},
-      {"entry.1108675670","entry.2099749519","entry.686536743","entry.1007710289","entry.553595352","entry.68145581","entry.1613375165","entry.369633415"},
-      {"entry.547662755","entry.1341296202","entry.2016970015","entry.565818566","entry.516080432","entry.624369123","entry.1289430951","entry.651925165"},
-      {"entry.1686098330","entry.1353514503","entry.1147680330","entry.463536733","entry.361701779","entry.935620407","entry.799813456","entry.872932068"},
-      {"entry.1805301822","entry.908710470","entry.1655319026","entry.669290301","entry.293867272","entry.1976823509","entry.916877349","entry.1697271908"},
-      {"entry.1833734458","entry.560654799","entry.102216654","entry.1021738104","entry.239221839","entry.1086998453","entry.1913373518","entry.879181614"},
-      {"entry.1051276648","entry.24681248","entry.2040495134","entry.1036063803","entry.818857647","entry.1125434731","entry.1463591272","entry.2038625118"},
-      {"entry.1092458334","entry.82790655","entry.2004824751","entry.1016526827","entry.467810038","entry.370641291","entry.1681493879","entry.318090532"},
-      {"entry.1736037603","entry.1712962438","entry.786867737","entry.1393834200","entry.910339490","entry.1151404678","entry.2146224678","entry.973371027"},
-      {"entry.2143721170","entry.712001352","entry.919974641","entry.1142628345","entry.1737435162","entry.1765279931","entry.885230708","entry.1394075929"},
-      {"entry.1711784366","entry.384591618","entry.727551167","entry.413515915","entry.1013973194","entry.1189584915","entry.1355563117","entry.1147670153"},
-      {"entry.488222834","entry.1819301157","entry.229626024","entry.2139534803","entry.1264152858","entry.322839153","entry.1237410752","entry.1520056163"},
-      {"entry.1922678614","entry.1784253077","entry.1014114353","entry.1711659410","entry.274965944","entry.134272482","entry.1024507424","entry.230611040"},
-      {"entry.1159200869","entry.2103098658","entry.2068176126","entry.624704976","entry.723624491","entry.1285381588","entry.266196737","entry.1690403357"},
-      {"entry.1942776621","entry.970083436","entry.1432431720","entry.1232356477","entry.122687633","entry.1441986603","entry.1606775578","entry.1200963722"},
-      {"entry.221276858","entry.1325730178","entry.1322541997","entry.1256238534","entry.766982390","entry.1384350353","entry.1269286734","entry.1648182067"},
-      {"entry.1551881026","entry.885470804","entry.318883204","entry.2076447515","entry.757382736","entry.1801881580","entry.1893952987","entry.1694451280"},
-      {"entry.599367667","entry.1193692957","entry.84537236","entry.383814949","entry.1590380662","entry.195685737","entry.90589781","entry.399713135"},
-      {"entry.1826138451","entry.214842897","entry.1926166373","entry.1793449713","entry.593745412","entry.32747945","entry.357377458","entry.399639497"},
-      {"entry.1965854686","entry.1632869581","entry.357488391","entry.2025558837","entry.1459318163","entry.62423361","entry.1063948085","entry.299054411"}
-    };
+    form.AddField(entryNames[entryNameIndex++], comments.additionalComments);
+    form.AddField(entryNames[entryNameIndex++], comments.technicalIssues);
 
     // Add trial data.
     for (int i = 0; i < allCompletedTrials.Length; ++i) {
       Trial trial = allCompletedTrials[i];
 
-      form.AddField(trialEntryNames[i,0], trial.trialType.ToString());
-      form.AddField(trialEntryNames[i,1], trial.environmentType.ToString());
-      form.AddField(trialEntryNames[i,2], trial.robotColor.ToString());
+      form.AddField(entryNames[entryNameIndex++], trial.trialType.ToString());
+      form.AddField(entryNames[entryNameIndex++], trial.environmentType.ToString());
+      form.AddField(entryNames[entryNameIndex++], trial.robotColor.ToString());
 
       // Send that robot type is not applicable if the trial is a test trial.
       if (trial.trialType == TrialType.TEST) {
-        form.AddField(trialEntryNames[i,3], "N/A");
+        form.AddField(entryNames[entryNameIndex++], "N/A");
       } else {
-        form.AddField(trialEntryNames[i,3], trial.robotType.ToString());
+        form.AddField(entryNames[entryNameIndex++], trial.robotType.ToString());
       }
 
-      form.AddField(trialEntryNames[i,4], trial.collision.ToString());
-      form.AddField(trialEntryNames[i,5], trial.swerve.ToString());
+      form.AddField(entryNames[entryNameIndex++], trial.collision.ToString());
+      form.AddField(entryNames[entryNameIndex++], trial.playerSwerve.ToString());
 
       // Send that robot and start distance are not applicable if the player did not swerve.
-      if (!trial.swerve) {
-        form.AddField(trialEntryNames[i,6], "N/A");
-        form.AddField(trialEntryNames[i,7], "N/A");
+      if (!trial.playerSwerve) {
+        form.AddField(entryNames[entryNameIndex++], "N/A");
+        form.AddField(entryNames[entryNameIndex++], "N/A");
       } else {
-        form.AddField(trialEntryNames[i,6], trial.robotDistance.ToString());
-        form.AddField(trialEntryNames[i,7], trial.startDistance.ToString());
+        form.AddField(entryNames[entryNameIndex++], trial.playerRobotDistance.ToString());
+        form.AddField(entryNames[entryNameIndex++], trial.playerStartDistance.ToString());
+      }
+
+      form.AddField(entryNames[entryNameIndex++], trial.robotSwerve.ToString());
+
+      // Send that robot and start distance are not applicable if the player did not swerve.
+      if (!trial.robotSwerve) {
+        form.AddField(entryNames[entryNameIndex++], "N/A");
+        form.AddField(entryNames[entryNameIndex++], "N/A");
+      } else {
+        form.AddField(entryNames[entryNameIndex++], trial.robotPlayerDistance.ToString());
+        form.AddField(entryNames[entryNameIndex++], trial.robotStartDistance.ToString());
       }
     }
 

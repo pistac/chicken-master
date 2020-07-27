@@ -107,6 +107,15 @@ public class SharedVariableManager : MonoBehaviour {
   public float playerRobotSwerveDistance { get; set; }
   public float playerStartSwerveDistance { get; set; }
 
+  // Distances reported by the robot and read by the trial manager.
+  public float robotPlayerSwerveDistance { get; set; }
+  public float robotStartSwerveDistance { get; set; }
+
+  // Variables for seeing if the player and robot swerved.
+  public bool playerSwerved { get; set; } = false;
+  public bool robotSwerved { get; set; } = false;
+
+  // The sum of collider diameter and swerve margin of the largest collider.
   private float _swerveWidthOfLargestAgent;
   public float swerveWidthOfLargestAgent {
     get => _swerveWidthOfLargestAgent;
