@@ -4885,7 +4885,6 @@ MonoBehaviour:
   participantDataPage2: {fileID: 1512158580}
   participantDataPage3: {fileID: 790010495}
   additionalCommentsPage: {fileID: 264834229}
-  pilotQuestionPage: {fileID: 0}
   completionCodePage: {fileID: 3054516}
   continueButton: {fileID: 2063231219}
   genderToggleGroup: {fileID: 907778026}
@@ -4903,8 +4902,6 @@ MonoBehaviour:
   seenBeforeErrorText: {fileID: 522285929}
   commentsInputField: {fileID: 1335479490}
   technicalIssuesInputField: {fileID: 2132478386}
-  pilotQuestionInputField: {fileID: 0}
-  pilotQuestionErrorText: {fileID: 0}
 --- !u!1 &726824754
 GameObject:
   m_ObjectHideFlags: 0
