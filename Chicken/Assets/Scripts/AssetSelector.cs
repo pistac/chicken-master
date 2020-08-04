@@ -133,9 +133,9 @@ public class AssetSelector : MonoBehaviour {
   void Start() {
     // Set up all the dictionaries.
     colliderRadii = new Dictionary<RobotType, float>();
-    colliderRadii.Add(RobotType.TEST, 0.5f);
-    colliderRadii.Add(RobotType.PR2, 0.8f);
-    colliderRadii.Add(RobotType.SOPHIA, 0.5f);
+    colliderRadii.Add(RobotType.TEST, 0.3f);
+    colliderRadii.Add(RobotType.PR2, 0.5f);
+    colliderRadii.Add(RobotType.SOPHIA, 0.3f);
 
     environments = new Dictionary<EnvironmentType, GameObject>();
     environments.Add(EnvironmentType.TEST, testEnvironment);

@@ -7,6 +7,10 @@ public class RobotController : MonoBehaviour {
 
 #pragma warning disable
   [SerializeField]
+  private SharedVariableManager sharedVariableManager;
+  [SerializeField]
+  private Transform playerTransform;
+  [SerializeField]
   private bool debugDoNotSwerve = false;
 #pragma warning restore
 
@@ -15,14 +19,14 @@ public class RobotController : MonoBehaviour {
   private float margin;
   private float swerveDistance;
   private float speed;
-  private float swerveSpeed;
+  private float swerveForwardSpeed;
+  private float swerveSideSpeed;
   private float rotationSpeed;
-  private float width;
+  private float radius;
   private int swerveDirection = 0;
-  private SharedVariableManager sharedVariableManager;
+
   private Vector3 positiveSwerveDirection;
   private Vector3 robotDirection;
-  private Transform playerTransform;
 
   void OnEnable() {
     // Subscribe unpausing to when the loading screen is finished.
@@ -39,35 +43,36 @@ public class RobotController : MonoBehaviour {
   }
 
   public void UpdateWidth() {
-    width = GetComponent<CapsuleCollider>().radius * 2;
-    margin = width * sharedVariableManager.swerveMarginRatio; // The swerving margin is a part of the width.
-    sharedVariableManager.swerveWidthOfLargestAgent = width + margin;
+    radius = GetComponent<CapsuleCollider>().radius;
+    margin = sharedVariableManager.swerveMargin;
+    sharedVariableManager.robotRadius = radius;
 
     // Minimum distance is calculated as the distance away from the player the robot
     // can be and still have time to swerve away assuming the player does not swerve.
-    // In this case, it is based on the distance the player moves at its usual speed (speed)
-    // during the time the robot is able to move at the swerve speed side component (swerveSpeed * cos45)
-    // the sufficient distance to the side (width + margin).
-    float minimumDistance = (speed + swerveSpeed) * sharedVariableManager.swerveWidthOfLargestAgent / (swerveSpeed * Mathf.Sqrt(2) / 2);
+    // 0.70710678118 is sin(45deg), sharedVariableManager.swerveSideSpeedRatio is always 0.5f.
+    float minimumDistance = (sharedVariableManager.robotRadius + sharedVariableManager.playerRadius + sharedVariableManager.swerveMargin) * 0.70710678118f * ((2-sharedVariableManager.swerveSideSpeedRatio) / sharedVariableManager.swerveSideSpeedRatio + 1);
     // An error margin is added to the minimum distance in order to have differen behavior each time.
-    swerveDistance = minimumDistance * Random.Range(1 - sharedVariableManager.errorMarginMaxRatio, 1 + sharedVariableManager.errorMarginMaxRatio);
+    swerveDistance = HelperFunctions.GenerateGaussian(minimumDistance, sharedVariableManager.swerveStandardDeviation);
     if (Application.isEditor) {
       if (debugDoNotSwerve) {
         swerveDistance = -10.0f;
       }
+      Debug.Log(sharedVariableManager.robotRadius + ", " +  sharedVariableManager.playerRadius + ", " + sharedVariableManager.swerveMargin + ", " + sharedVariableManager.swerveSideSpeedRatio);
+      Debug.Log("minimumDistance = " + minimumDistance);
       Debug.Log("swerveDistance = " + swerveDistance);
     }
   }
 
-  void Start() {
-    sharedVariableManager = GameObject.Find("SharedVariableManager").GetComponent<SharedVariableManager>();
-
+  void Awake() {
     robotDirection = transform.parent.InverseTransformDirection(transform.forward);
     positiveSwerveDirection = transform.parent.InverseTransformDirection(transform.right);
-    playerTransform = GameObject.FindWithTag("Player").transform;
     speed = sharedVariableManager.agentSpeed;
-    swerveSpeed = sharedVariableManager.agentSwerveSpeed;
+    swerveForwardSpeed = speed * (1 - sharedVariableManager.swerveSideSpeedRatio);
+    swerveSideSpeed = speed * sharedVariableManager.swerveSideSpeedRatio;
     rotationSpeed = sharedVariableManager.rotationSpeed;
+  }
+
+  void Start() {
     UpdateWidth();
   }
 
@@ -121,18 +126,20 @@ public class RobotController : MonoBehaviour {
         sharedVariableManager.robotSwerved = true;
 
         // Report swerve distances.
-        sharedVariableManager.robotPlayerSwerveDistance = Vector3.Distance(transform.position, playerTransform.position);
-        sharedVariableManager.robotStartSwerveDistance = Vector3.Distance(transform.position, GameObject.Find("RobotStartPoint").transform.position);
+        sharedVariableManager.robotPlayerSwerveDistance = (playerTransform.position - transform.position).z;
+        sharedVariableManager.robotStartSwerveDistance = (GameObject.Find("RobotStartPoint").transform.position - transform.position).z;
       }
 
       // Move robot along swerve direction.
-      Vector3 direction = Vector3.Normalize(robotDirection + (positiveSwerveDirection * swerveDirection));
-      transform.localPosition += direction * swerveSpeed * Time.fixedDeltaTime;
+      // Vector3 direction = Vector3.Normalize(robotDirection + (positiveSwerveDirection * swerveDirection));
+      // transform.localPosition += direction * swerveSpeed * Time.fixedDeltaTime;
+      Vector3 swerveVelocity = swerveForwardSpeed * robotDirection + swerveSideSpeed * positiveSwerveDirection * swerveDirection;
+      transform.localPosition += swerveVelocity * Time.fixedDeltaTime;
 
       // Rotate robot.
       transform.localRotation = Quaternion.LookRotation(
           Vector3.RotateTowards(transform.parent.InverseTransformDirection(transform.forward),
-          direction, rotationSpeed, 0.0f));
+          swerveVelocity.normalized, rotationSpeed, 0.0f));
     }
   }
 

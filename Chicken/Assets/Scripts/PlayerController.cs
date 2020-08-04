@@ -7,6 +7,10 @@ public class PlayerController : MonoBehaviour {
 
 #pragma warning disable
   [SerializeField]
+  private SharedVariableManager sharedVariableManager;
+  [SerializeField]
+  private Transform robotTransform;
+  [SerializeField]
   private float gameOverDelay = 3.0f;
   [SerializeField]
   private float collisionDelay = 0.5f;
@@ -16,15 +20,14 @@ public class PlayerController : MonoBehaviour {
   private bool paused = true;
   private float margin;
   private float speed;
-  private float swerveSpeed;
+  private float swerveForwardSpeed;
+  private float swerveSideSpeed;
   private float rotationSpeed;
-  private float width;
+  private float radius;
   private int swerveDirection = 0;
-  private SharedVariableManager sharedVariableManager;
   private Vector3 playerDirection;
   private Vector3 positiveSwerveDirection;
   private Vector3 upDirection;
-  private Transform robotTransform;
 
   void OnEnable() {
     // Subscribe unpausing to when the loading screen is finished.
@@ -36,20 +39,18 @@ public class PlayerController : MonoBehaviour {
     SharedVariableManager.onLoadIsFinished -= UnPause;
   }
 
-  void Start() {
-    sharedVariableManager = GameObject.Find("SharedVariableManager").GetComponent<SharedVariableManager>();
-
+  void Awake() {
     // Calculate movement basis vectors relative to parent.
     playerDirection = transform.parent.InverseTransformDirection(transform.forward);
     positiveSwerveDirection = transform.parent.InverseTransformDirection(transform.right);
 
-    robotTransform = GameObject.FindWithTag("Robot").transform;
     speed = sharedVariableManager.agentSpeed;
-    swerveSpeed = sharedVariableManager.agentSwerveSpeed;
+    swerveForwardSpeed = speed * (1 - sharedVariableManager.swerveSideSpeedRatio);
+    swerveSideSpeed = speed * sharedVariableManager.swerveSideSpeedRatio;
     rotationSpeed = sharedVariableManager.rotationSpeed;
-    width = GetComponent<CapsuleCollider>().radius * 2;
-    margin = width * sharedVariableManager.swerveMarginRatio; // The swerving margin is a part of the width.
-    sharedVariableManager.swerveWidthOfLargestAgent = width + margin;
+    radius = GetComponent<CapsuleCollider>().radius;
+    margin = sharedVariableManager.swerveMargin; // The swerving margin is a part of the width.
+    sharedVariableManager.playerRadius = radius;
   }
 
   public void Pause() {
@@ -102,8 +103,8 @@ public class PlayerController : MonoBehaviour {
       sharedVariableManager.playerSwerved = true;
 
       // Report swerve distances.
-      sharedVariableManager.playerRobotSwerveDistance = Vector3.Distance(transform.position, robotTransform.position);
-      sharedVariableManager.playerStartSwerveDistance = Vector3.Distance(transform.position, GameObject.Find("PlayerStartPoint").transform.position);
+      sharedVariableManager.playerRobotSwerveDistance = (robotTransform.position - transform.position).z;
+      sharedVariableManager.playerStartSwerveDistance = (GameObject.Find("PlayerStartPoint").transform.position - transform.position).z;
 
       // Pick a random swerve direction.
       PickSwerveDirection();
@@ -121,13 +122,15 @@ public class PlayerController : MonoBehaviour {
           playerDirection, rotationSpeed, 0.0f));
     } else { // If the player is currently swerving and has not yet swerved fully.
       // Move player along swerve direction.
-      Vector3 direction = Vector3.Normalize(playerDirection + (positiveSwerveDirection * swerveDirection));
-      transform.localPosition += direction * swerveSpeed * Time.fixedDeltaTime;
+      // Vector3 direction = Vector3.Normalize(playerDirection + (positiveSwerveDirection * swerveDirection));
+      // transform.localPosition += direction * swerveSpeed * Time.fixedDeltaTime;
+      Vector3 swerveVelocity = swerveForwardSpeed * playerDirection + swerveSideSpeed * positiveSwerveDirection * swerveDirection;
+      transform.localPosition += swerveVelocity * Time.fixedDeltaTime;
 
       // Rotate player towards the swerve direction.
       transform.localRotation = Quaternion.LookRotation(
           Vector3.RotateTowards(transform.parent.InverseTransformDirection(transform.forward),
-          direction, rotationSpeed, 0.0f));
+          swerveVelocity.normalized, rotationSpeed, 0.0f));
     }
   }
 

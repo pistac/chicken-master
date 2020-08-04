@@ -51,7 +51,7 @@ public class SharedVariableManager : MonoBehaviour {
 
   // Inspector variables:
 
-  // The speed in Unity units per second that the agents move along their respective directions.
+  // The speed in Unity units per second that the agents move along their respective forward directions when not swerving.
   [FormerlySerializedAs("Agent Speed")]
   [SerializeField]
   [Range(0.0f, 10.0f)]
@@ -61,24 +61,24 @@ public class SharedVariableManager : MonoBehaviour {
     private set => _agentSpeed = value;
   }
 
-  // The speed in Unity units per second that the agents move along their respective directions when swerving.
-  [FormerlySerializedAs("Agent Swerve Speed")]
-  [SerializeField]
-  [Range(0.0f, 10.0f)]
-  private float _agentSwerveSpeed = 0.5f;
-  public float agentSwerveSpeed {
-    get => _agentSwerveSpeed;
-    private set => _agentSwerveSpeed = value;
-  }
+  // The ratio of the forward speed that is made into side speed.
+  // [FormerlySerializedAs("Agent Swerve Speed Ratio")]
+  // [SerializeField]
+  // [Range(0.0f, 1.0f)]
+  // private float _swerveSideSpeedRatio = 0.5f;
+  // public float swerveSideSpeedRatio {
+  //   get => _swerveSideSpeedRatio;
+  //   private set => _swerveSideSpeedRatio = value;
+  // }
 
-  // The maximum number of Unity units that the robot can get the minimum swerve distance wrong.
-  [FormerlySerializedAs("Maximum Robot Swerve Error Ratio")]
+  // The standard deviation of the sampled swerve distance.
+  [FormerlySerializedAs("Swerve Distance Standard Deviation")]
   [SerializeField]
-  [Range(0.0f, 1.0f)]
-  private float _errorMarginMaxRatio = 1.0f;
-  public float errorMarginMaxRatio {
-    get => _errorMarginMaxRatio;
-    private set => _errorMarginMaxRatio = value;
+  [Range(0.0f, 20.0f)]
+  private float _swerveStandardDeviation = 1.0f;
+  public float swerveStandardDeviation {
+    get => _swerveStandardDeviation;
+    private set => _swerveStandardDeviation = value;
   }
 
   // The speed in radians per second at which agents rotate along local y when swerving.
@@ -91,14 +91,14 @@ public class SharedVariableManager : MonoBehaviour {
     private set => _rotationSpeed = value;
   }
 
-  // The ratio that defines how large of a part of the width that the margin is.
-  [FormerlySerializedAs("Swerve Margin Ratio")]
+  // The size of the swerve margin.
+  [FormerlySerializedAs("Swerve Margin")]
   [SerializeField]
-  [Range(0.0f, 1.0f)]
-  private float _swerveMarginRatio = 0.2f;
-  public float swerveMarginRatio {
-    get => _swerveMarginRatio;
-    private set => _swerveMarginRatio = value;
+  [Range(0.0f, 5.0f)]
+  private float _swerveMargin = 0.2f;
+  public float swerveMargin {
+    get => _swerveMargin;
+    private set => _swerveMargin = value;
   }
 
   // Other variables:
@@ -115,14 +115,33 @@ public class SharedVariableManager : MonoBehaviour {
   public bool playerSwerved { get; set; } = false;
   public bool robotSwerved { get; set; } = false;
 
-  // The sum of collider diameter and swerve margin of the largest collider.
-  private float _swerveWidthOfLargestAgent;
-  public float swerveWidthOfLargestAgent {
-    get => _swerveWidthOfLargestAgent;
+  // The radius of the player agent's collider.
+  private float _playerRadius;
+  public float playerRadius { get => _playerRadius;
     set {
-      _swerveWidthOfLargestAgent = (value > _swerveWidthOfLargestAgent) ? value : _swerveWidthOfLargestAgent;
+      _playerRadius = value;
 
-      if (Application.isEditor) Debug.Log("swerveWidthOfLargestAgent = " + _swerveWidthOfLargestAgent);
+      if (2 * playerRadius + swerveMargin > swerveWidthOfLargestAgent) {
+        swerveWidthOfLargestAgent = 2 * playerRadius + swerveMargin;
+      }
     }
   }
+
+  // The radius of the robot agent's collider.
+  private float _robotRadius;
+  public float robotRadius { get => _robotRadius;
+    set {
+      _robotRadius = value;
+
+      if (2 * robotRadius + swerveMargin > swerveWidthOfLargestAgent) {
+        swerveWidthOfLargestAgent = 2 * robotRadius + swerveMargin;
+      }
+    }
+  }
+
+  // The margin plus the width (twice the radius) of the largest ratio.
+  public float swerveWidthOfLargestAgent { get; private set; }
+
+  // The ratio of the forward speed that is made into side speed. With how things are set up, it needs to be 0.5f.
+  public float swerveSideSpeedRatio { get; private set; } = 0.5f;
 }
