@@ -103,8 +103,8 @@ public class PlayerController : MonoBehaviour {
       sharedVariableManager.playerSwerved = true;
 
       // Report swerve distances.
-      sharedVariableManager.playerRobotSwerveDistance = (robotTransform.position - transform.position).z;
-      sharedVariableManager.playerStartSwerveDistance = (GameObject.Find("PlayerStartPoint").transform.position - transform.position).z;
+      sharedVariableManager.playerRobotSwerveDistance = Mathf.Abs((robotTransform.position - transform.position).z);
+      sharedVariableManager.playerStartSwerveDistance = Mathf.Abs((GameObject.Find("PlayerStartPoint").transform.position - transform.position).z);
 
       // Pick a random swerve direction.
       PickSwerveDirection();

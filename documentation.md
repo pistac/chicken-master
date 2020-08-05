@@ -20,7 +20,7 @@ The general flow of the project is as follows. The participant accepts the HIT o
 
 The game starts in the IntroScene, where participants read instructions and give consent to partake. Participants also select their avatar's gender expression and skin color. The main script governing this scene is the IntroManager.
 
-Then, the game goes onto the trial scene. Participants are told what type of trial it is on the loading screen, then the trial starts, where the participant faces a robot and can decide to swerve. A close-up of the robot is displayed on the screen. After the agents have passed each other, the trial is over. The scene is then reloaded with new trial settings. The main script governing this scene is the TrialManager. If at any point in the trial scene the mouse cursor is taken outside of the screen area, the game is paused and an overlay is displayed above the rest of the game's content. The loading screens are not paused.
+Then, the game goes onto the trial scene. Participants are told what type of trial it is on the loading screen, then the trial starts, where the participant faces a robot and can decide to swerve. A close-up of the robot is displayed on the screen. After the agents have passed each other, the trial is over. The scene is then reloaded with new trial settings. The main script governing this scene is the TrialManager.
 
 After all the trials are complete, the participant is taken to the ending scene. Here, the participant enters their demographic information for the experiment in three steps, are allowed to enter additional comments and report technical issues and then are given the mturk completion code in a dialog box. The participant returns to the mturk page and enters the completion code to complete the HIT.
 
@@ -103,7 +103,6 @@ Directory containing all of the scripts of the game. An overview of each script 
 - IntroManager: Driving script for the intro scene. Defines behavior for the buttons that require scripting in the scene, and validates input where required. Contacts the ExperimentDataManager script to send appearance data.
 - OverlayManager: Defines the behavior of the loading screens during the trial scene. Manages the onLoadIsFinished delegate by setting the flags in the SharedVariableManager.
 - Participant: Defines a data structure to hold all the data about a participant.
-- PauseManager: Defines behavior of pausing the game when the mouse cursor moves outside of the game area. This is to make sure that the mouse cursor is never positioned in a way that makes the space key behave differently, such as when the cursor is placed in a search field.
 - PlayerController: Takes player input and moves the player avatar. Also defines when the game is over. Relies on the onLoadIsFinished delegate.
 - RobotCameraController: Identical to CameraController, but used on the robot's camera.
 - RobotController: Moves the robot agent, decides when to swerve. Relies on the onLoadIsFinished delegate.
