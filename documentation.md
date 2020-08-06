@@ -126,7 +126,7 @@ The directory is required by Unity, and has a specific structure that Unity reco
 
 ### Building WebGL and publishing
 
-In order to build the game, simply go into the build settings in Unity, ensure the platform is WebGL, click Build and select any location. Publish the build by replacing the contents of the docs directory by the contents of the directory created during the building process, then adding the files in git, commit and push.
+In order to build the game, simply go into the build settings in Unity, ensure the platform is WebGL, click Build and select any location. Note for Windows users: Unity might complain if you try to build inside a directory that contains white spaces in the folder names. Building in "C://temp" seems to work fine. Publish the build by replacing the contents of the docs directory by the contents of the directory created during the building process, then adding the files in git, commit and push.
 
 ## Experiment data
 
