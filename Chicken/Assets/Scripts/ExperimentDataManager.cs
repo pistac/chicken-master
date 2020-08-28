@@ -206,11 +206,11 @@ public class ExperimentDataManager : MonoBehaviour {
       // we are not allowed to fetch data from the url, but the data is still posted correctly.
       if (w.isNetworkError || w.isHttpError) {
         Debug.LogError(w.error);
-		else
-        {
-            Debug.Log("Form upload complete!");
-        }
       }
+	  else
+	  {
+		  Debug.Log("Form upload complete!");
+		}
 
       dataSentText.SetActive(true);
     }
