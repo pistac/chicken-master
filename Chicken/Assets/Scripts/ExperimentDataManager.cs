@@ -209,7 +209,7 @@ public class ExperimentDataManager : MonoBehaviour {
       }
 	  else
 	  {
-		  window.alert("Form upload complete!");
+		  Debug.Log("Form upload complete!");
 		}
 
       dataSentText.SetActive(true);
