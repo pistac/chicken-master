@@ -207,10 +207,6 @@ public class ExperimentDataManager : MonoBehaviour {
       if (w.isNetworkError || w.isHttpError) {
         Debug.LogError(w.error);
       }
-	  else
-	  {
-		  Debug.Log("Form upload complete!");
-		}
 
       dataSentText.SetActive(true);
     }
