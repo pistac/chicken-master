@@ -15,6 +15,8 @@ public class TrialManager : MonoBehaviour {
   [SerializeField]
   private bool debugTrials = false;
   [SerializeField]
+  private bool testingTrials = false;
+  [SerializeField]
   private string AIText;
   [SerializeField]
   private string humanText;
@@ -157,6 +159,8 @@ public class TrialManager : MonoBehaviour {
       trials.Add(new Trial(EnvironmentType.OPEN, RobotType.SOPHIA, TrialType.HUMAN));
       trials.Add(new Trial(EnvironmentType.OPEN, RobotType.SOPHIA, TrialType.AI));
       trials.Add(new Trial(EnvironmentType.OPEN, RobotType.SOPHIA, TrialType.HUMAN));
+    } else if (testingTrials) {
+      trials.Add(new Trial(EnvironmentType.OPEN, RobotType.PR2, TrialType.AI));
     } else {
       // Add the trials.
       trials.Add(new Trial(EnvironmentType.OPEN, RobotType.PR2, TrialType.AI));
@@ -229,11 +233,11 @@ public class TrialManager : MonoBehaviour {
     // Set the approprite robot view text.
     switch (trials[currentTrialNum].trialType) {
       case TrialType.AI:
-      robotViewText.text = AIText;
-      break;
+        robotViewText.text = AIText;
+        break;
       case TrialType.HUMAN:
-      robotViewText.text = humanText;
-      break;
+        robotViewText.text = humanText;
+        break;
     }
 
     // Display the loading screen depending on the type of trial.
@@ -300,8 +304,8 @@ public class TrialManager : MonoBehaviour {
         }
 
         Debug.Log("Number of trials: " + trials.Count);
-        Debug.Log("Number of swerves: " + numSwerves + ", swerve rate: " + ((float) numSwerves / trials.Count));
-        Debug.Log("Number of collisions: " + numCollisions + ", collision rate: " + ((float) numCollisions / trials.Count));
+        Debug.Log("Number of swerves: " + numSwerves + ", swerve rate: " + ((float)numSwerves / trials.Count));
+        Debug.Log("Number of collisions: " + numCollisions + ", collision rate: " + ((float)numCollisions / trials.Count));
       }
 
       // Load ending scene, initiating packing and sending of data.

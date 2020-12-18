@@ -177,7 +177,7 @@ public class EndingManager : MonoBehaviour {
       continueButton.SetActive(false);
 
       // Tell experiment data manager to start packing and sending data.
-      experimentDataManager.PackAndSendExperimentData();
+      experimentDataManager.PackAndSendExperimentDataServer();
     }
   }
 
